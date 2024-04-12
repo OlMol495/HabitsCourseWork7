@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "habitscoursework7"
+version = "0.1.0"
+description = ""
+authors = ["Olga Lebedeva <olga.s.lebedeva@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
