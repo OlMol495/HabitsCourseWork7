@@ -1,0 +1,242 @@
+[
+  {
+    "model": "habits.habit",
+    "pk": 4,
+    "fields": {
+      "title": "одеть беговые кроссовки",
+      "user": 1,
+      "place": "дом",
+      "time": "08:00:00",
+      "is_pleasant": false,
+      "related_habit": null,
+      "frequency": 3,
+      "reward": "выпить свежевыжатый сок",
+      "duration": 60,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 5,
+    "fields": {
+      "title": "полежать на лежаке у бассейна",
+      "user": 1,
+      "place": "бассейн",
+      "time": "09:00:00",
+      "is_pleasant": true,
+      "related_habit": null,
+      "frequency": 2,
+      "reward": null,
+      "duration": 120,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 6,
+    "fields": {
+      "title": "зайти в бассейн",
+      "user": 1,
+      "place": "бассейн",
+      "time": "08:58:00",
+      "is_pleasant": false,
+      "related_habit": 5,
+      "frequency": 2,
+      "reward": null,
+      "duration": 120,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 7,
+    "fields": {
+      "title": "выпить кофе",
+      "user": 1,
+      "place": "улица",
+      "time": null,
+      "is_pleasant": true,
+      "related_habit": null,
+      "frequency": 4,
+      "reward": null,
+      "duration": 120,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 8,
+    "fields": {
+      "title": "посетить спортзал",
+      "user": 1,
+      "place": "спортзал",
+      "time": "16:00:00",
+      "is_pleasant": false,
+      "related_habit": 7,
+      "frequency": 4,
+      "reward": null,
+      "duration": 120,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 9,
+    "fields": {
+      "title": "протереть пыль на кухне",
+      "user": 1,
+      "place": "дом",
+      "time": "07:00:00",
+      "is_pleasant": false,
+      "related_habit": null,
+      "frequency": 1,
+      "reward": "сьесть конфетку",
+      "duration": 120,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 10,
+    "fields": {
+      "title": "повтыкать в интернетик",
+      "user": 1,
+      "place": "телефон",
+      "time": null,
+      "is_pleasant": true,
+      "related_habit": null,
+      "frequency": 1,
+      "reward": null,
+      "duration": 100,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 11,
+    "fields": {
+      "title": "выйти в парк",
+      "user": 1,
+      "place": "парк",
+      "time": "17:00:00",
+      "is_pleasant": false,
+      "related_habit": 10,
+      "frequency": 1,
+      "reward": null,
+      "duration": 110,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 12,
+    "fields": {
+      "title": "поздороваться с соседом",
+      "user": 2,
+      "place": "в холле",
+      "time": "08:00:00",
+      "is_pleasant": false,
+      "related_habit": null,
+      "frequency": 1,
+      "reward": "поехать на такси",
+      "duration": 5,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 13,
+    "fields": {
+      "title": "выключить все кондеи",
+      "user": 2,
+      "place": "дом",
+      "time": "07:50:00",
+      "is_pleasant": false,
+      "related_habit": null,
+      "frequency": 1,
+      "reward": "выпить пиво",
+      "duration": 45,
+      "is_public": false
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 14,
+    "fields": {
+      "title": "съесть шоколадку",
+      "user": 2,
+      "place": "кухня",
+      "time": "07:30:00",
+      "is_pleasant": true,
+      "related_habit": null,
+      "frequency": 1,
+      "reward": null,
+      "duration": 15,
+      "is_public": false
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 15,
+    "fields": {
+      "title": "приготовить кофе",
+      "user": 2,
+      "place": "кухня",
+      "time": "07:30:00",
+      "is_pleasant": false,
+      "related_habit": 14,
+      "frequency": 1,
+      "reward": null,
+      "duration": 90,
+      "is_public": false
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 16,
+    "fields": {
+      "title": "включить пылесос",
+      "user": 2,
+      "place": "дом",
+      "time": "13:00:00",
+      "is_pleasant": false,
+      "related_habit": 10,
+      "frequency": 6,
+      "reward": null,
+      "duration": 30,
+      "is_public": true
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 17,
+    "fields": {
+      "title": "включить стиралку",
+      "user": 2,
+      "place": "дом",
+      "time": "07:20:00",
+      "is_pleasant": false,
+      "related_habit": null,
+      "frequency": 1,
+      "reward": "посмотреть ютюб",
+      "duration": 25,
+      "is_public": false
+    }
+  },
+  {
+    "model": "habits.habit",
+    "pk": 18,
+    "fields": {
+      "title": "полить цветы",
+      "user": 2,
+      "place": "дом",
+      "time": "20:00:00",
+      "is_pleasant": false,
+      "related_habit": 10,
+      "frequency": 10,
+      "reward": null,
+      "duration": 120,
+      "is_public": false
+    }
+  }
+]
