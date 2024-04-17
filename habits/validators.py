@@ -54,7 +54,8 @@ class DurationValidator:
         self.field = field
 
     def __call__(self, value):
-        duration = dict(value).get(self.field)
+        duration = (dict(value).get(self.field))
+        #duration = int(value.get(self.field))
 
         if duration > 120:
             raise ValidationError(
