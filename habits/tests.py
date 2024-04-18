@@ -9,10 +9,20 @@ from users.models import User
 class HabitTestCase(APITestCase):
     """ Тесты на CRUD привычек """
 
+    data = {
+        "title": "test-title",
+        "place": "test-place",
+        "time": "20:00:00",
+        "is_pleasant": False,
+        "frequency": 5,
+        "reward": "test-reward",
+        "duration": 120,
+    }
+
     def setUp(self):
         self.user1 = User.objects.create(email="test1@admin.pro", password="admin")
         self.user2 = User.objects.create(email="test2@admin.pro", password="admin")
-        self.habitpleasnt = Habit.objects.create(
+        self.habitpleasant = Habit.objects.create(
             title='Test-pleasant',
             user=self.user1,
             place="test-place",
@@ -32,26 +42,19 @@ class HabitTestCase(APITestCase):
             frequency=1,
             reward="test-reward",
             duration=25,
-            is_public=False,
+            is_public=True,
         )
 
     def test_create_habit(self):
         """ Тесты на создание привычки """
         self.client.force_authenticate(user=self.user1)
-        data = {
-            "title": "test-title",
-            "user": 1,
-            "place": "test-place",
-            "time": "20:00:00",
-            "is_pleasant": False,
-            "frequency": 5,
-            "reward": "test-reward",
-            "duration": 120,
-        }
+        HabitTestCase.data["user"] = self.user1.pk
+        data = HabitTestCase.data
         response = self.client.post(
             reverse('habits:habit-create'),
             data=data
         )
+        print(response.data)
 
         # Проверка на статус ответа
         self.assertEqual(
@@ -95,57 +98,11 @@ class HabitTestCase(APITestCase):
 
         # Проверка на верность структуры и полей в списке
         self.assertEqual.__self__.maxDiff = None
-        self.assertEqual(
-            response.json(),
-            {
-                    "count": 2,
-                    "next": None,
-                    "previous": None,
-                    "results": [
-                        {
-                            "id": 4,
-                            "duration": 25,
-                            "related_habit": None,
-                            "title": "Test-pleasant",
-                            "place": "test-place",
-                            "time": "07:20:00",
-                            "is_pleasant": True,
-                            "frequency": 1,
-                            "reward": None,
-                            "is_public": False,
-                            "user": 3
-                        },
-                        {
-                            "id": 5,
-                            "duration": 25,
-                            "related_habit": None,
-                            "title": "Test-good",
-                            "place": "test-place",
-                            "time": "07:20:00",
-                            "is_pleasant": False,
-                            "frequency": 1,
-                            "reward": "test-reward",
-                            "is_public": False,
-                            "user": 3,
-                        }
-                    ]
-            }
-        )
+        self.assertEqual(response.json()["count"], 2)
 
     def test_list_habit_public(self):
         """ Тесты на список публичных привычек """
         self.client.force_authenticate(user=self.user2)
-        Habit.objects.create(
-            title='Test1',
-            user=self.user1,
-            place="test-place",
-            time="07:20:00",
-            is_pleasant=True,
-            frequency=1,
-            reward="test-reward",
-            duration=25,
-            is_public=True,
-        )
 
         response = self.client.get(reverse('habits:habits-public-list'))
 
@@ -155,63 +112,40 @@ class HabitTestCase(APITestCase):
             status.HTTP_200_OK
         )
 
-        # Проверка на верность структуры и полей в списке
+        # Проверка что список сформирован с учетом фильтров
         self.assertEqual.__self__.maxDiff = None
-        self.assertEqual(
-            response.json(),
-            {
-                    "count": 1,
-                    "next": None,
-                    "previous": None,
-                    "results": [
-                        {
-                            "id": 3,
-                            "duration": 25,
-                            "related_habit": None,
-                            "title": "Test1",
-                            "place": "test-place",
-                            "time": "07:20:00",
-                            "is_pleasant": True,
-                            "frequency": 1,
-                            "reward": "test-reward",
-                            "is_public": True,
-                            "user": 1
-                        }
-                    ]
-            }
-        )
+        self.assertEqual(response.data["count"], 1)
+
     def test_detail_habit(self):
         """ Тест на отображение деталей конкретной привычки """
         self.client.force_authenticate(user=self.user1)
         response = self.client.get(
-            reverse("habits:habit-detail", args=[1])
+            reverse("habits:habit-detail", args=[self.habitgood.pk])
         )
         # Проверка на код ответа
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Проверка на содержимое поля title
-        self.assertEqual(response.data["title"], "Test-pleasant")
+        self.assertEqual(response.data["title"], "Test-good")
 
     def test_detail_habit_alien(self):
         """ Тест на отображение деталей конкретной привычки
-        посторонним пользователем"""
+        постороннему пользователю"""
         self.client.force_authenticate(user=self.user2)
+        HabitTestCase.data["user"] = self.user1
+
         response = self.client.get(
-            reverse("habits:habit-detail", args=[1])
+            reverse("habits:habit-detail", args=[self.habitgood.pk])
         )
         # Проверка на код ответа
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_habit(self):
         """ Тесты на обновление данных привычки """
-        #self.client.force_authenticate(user=self.user1)
-
-        #response = self.client.post(reverse('habits:habit-update', args=[1]))
-        #habit_id = response.data['id']
 
         # Проверка, что владелец может вносить изменения
         self.client.force_authenticate(user=self.user1)
         update_habit = self.client.patch(
-            reverse("habits:habit-update", args=[1]),
+            reverse("habits:habit-update", args=[self.habitgood.id]),
             data={"title": "Test1"}
         )
         # Проверка на статус ответа
@@ -225,9 +159,115 @@ class HabitTestCase(APITestCase):
         # Проверка на невозможность внесения изменений в урок, созданный другим пользователем
         self.client.force_authenticate(user=self.user2)
         update_habit = self.client.patch(
-            reverse("habits:habit-update", args=[1]),
-            data={"title": "Updated title"},
+            reverse("habits:habit-update", args=[self.habitgood.id]),
+            data={"title": "Updated title"}, )
+        self.assertEqual(
+            update_habit.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_habit(self):
+        # Проверка на невозможность удаления урока сторонним пользователем
+        self.client.force_authenticate(user=self.user2)
+        delete_habit = self.client.delete(reverse(
+            'habits:habit-delete', args=[self.habitgood.id]))
+        self.assertEqual(delete_habit.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Проверка на удаление урока владельцем
+        self.client.force_authenticate(user=self.user1)
+        delete_habit = self.client.delete(reverse(
+            'habits:habit-delete', args=[self.habitgood.id]))
+
+        # Проверка статуса ответа
+        self.assertEquals(
+            delete_habit.status_code,
+            status.HTTP_204_NO_CONTENT
+        )
+
+        # Проверка отсутствия удаленного урока в базе
+        get_deleted_habit = self.client.get(reverse(
+            "habits:habit-detail", args=[self.habitgood.id]))
+        self.assertEqual(
+            get_deleted_habit.status_code, status.HTTP_404_NOT_FOUND
+        )
+
+    def test_create_false_habit(self):
+        """ Тесты на создание привычки с ошибками """
+        self.client.force_authenticate(user=self.user1)
+
+        # Проверка на валидатор RelatedAndReward
+        HabitTestCase.data["related_habit"] = self.habitpleasant
+        response = self.client.post(
+            reverse('habits:habit-create'),
+            data=HabitTestCase.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор related_and_pleasant
+        HabitTestCase.data["is_pleasant"] = True
+        response = self.client.post(
+            reverse('habits:habit-create'),
+            data=HabitTestCase.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор PleasantRewardRelated
+        HabitTestCase.data["related_habit"] = ""
+        response = self.client.post(
+            reverse('habits:habit-create'),
+            data=HabitTestCase.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор DurationValidator
+        HabitTestCase.data["is_pleasant"] = False
+        HabitTestCase.data["duration"] = 150
+        response = self.client.post(
+            reverse('habits:habit-create'),
+            data=HabitTestCase.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор FrequencyValidator
+        HabitTestCase.data["frequency"] = 10
+        response = self.client.post(
+            reverse('habits:habit-create'),
+            data=HabitTestCase.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_false_habit(self):
+        """ Тесты на изменение привычки с ошибками """
+        self.client.force_authenticate(user=self.user1)
+
+        # Проверка на валидатор RelatedAndReward
+        update_habit = self.client.patch(
+            reverse("habits:habit-update", args=[self.habitgood.id]),
+            data={"related_habit": self.habitgood.id}
         )
         self.assertEqual(
-            update_habit.status_code, status.HTTP_403_FORBIDDEN
-        )
+            update_habit.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор related_and_pleasant
+        update_habit = self.client.patch(
+            reverse("habits:habit-update", args=[self.habitgood.id]),
+            data={
+                "related_habit": self.habitgood.id,
+                "is_pleasant": True,
+                "reward": ""})
+        self.assertEqual(
+            update_habit.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор PleasantRewardRelated
+        update_habit = self.client.patch(
+            reverse("habits:habit-update", args=[self.habitgood.id]),
+            data={"related_habit": self.habitgood.id, "is_pleasant": True})
+        self.assertEqual(
+            update_habit.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор DurationValidator
+        update_habit = self.client.patch(
+            reverse("habits:habit-update", args=[self.habitgood.id]),
+            data={"duration": 150})
+        self.assertEqual(
+            update_habit.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Проверка на валидатор FrequencyValidator
+        update_habit = self.client.patch(
+            reverse("habits:habit-update", args=[self.habitgood.id]),
+            data={"frequency": 10})
+        self.assertEqual(
+            update_habit.status_code, status.HTTP_400_BAD_REQUEST)

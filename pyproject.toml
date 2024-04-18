@@ -18,6 +18,12 @@ django-filter = "^24.2"
 coverage = "^7.4.4"
 drf-yasg = "^1.21.7"
 django-cors-headers = "^4.3.1"
+requests = "^2.31.0"
+celery = "^5.4.0"
+redis = "^5.0.3"
+eventlet = "^0.36.1"
+django-celery-beat = "^2.6.0"
+flake8-for-pycharm = "^0.4.1"
 
 
 [build-system]

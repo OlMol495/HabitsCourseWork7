@@ -2,14 +2,15 @@ from rest_framework.serializers import ValidationError
 
 
 class RelatedAndRewardValidator:
+    """ Валидатор на то, что привычка не может быть связанной и иметь вознаграждение"""
 
     def __init__(self, field1, field2):
         self.field1 = field1
         self.field2 = field2
 
     def __call__(self, value):
-        related_habit = dict(value).get(self.field1)
-        reward = dict(value).get(self.field2)
+        related_habit = value.get(self.field1)
+        reward = value.get(self.field2)
 
         if related_habit and reward:
             raise ValidationError(
@@ -30,6 +31,7 @@ class RelatedAndRewardValidator:
 
 
 class PleasantRewardRelatedValidator:
+    """ Валидатор что приятная привычка не может иметь вознаграждение и связанную привычку"""
 
     def __init__(self, field1, field2, field3):
         self.field1 = field1
@@ -37,9 +39,9 @@ class PleasantRewardRelatedValidator:
         self.field3 = field3
 
     def __call__(self, value):
-        is_pleasant = dict(value).get(self.field1)
-        related_habit = dict(value).get(self.field2)
-        reward = dict(value).get(self.field3)
+        is_pleasant = value.get(self.field1)
+        related_habit = value.get(self.field2)
+        reward = value.get(self.field3)
 
         if is_pleasant:
             if reward or related_habit:
@@ -49,37 +51,38 @@ class PleasantRewardRelatedValidator:
 
 
 class DurationValidator:
+    """ Валидатор на время выполнения привычки"""
 
     def __init__(self, field):
         self.field = field
 
     def __call__(self, value):
-        duration = (dict(value).get(self.field))
-        #duration = int(value.get(self.field))
-
-        if duration > 120:
+        duration = value.get(self.field)
+        if duration and duration > 120:
             raise ValidationError(
                 'Выполнение привычки не может превышать 120 секунд'
             )
 
 
 class FrequencyValidator:
+    """ Валидатор на частоту выполнения привычки"""
 
     def __init__(self, field):
         self.field = field
 
     def __call__(self, value):
-        frequency = dict(value).get(self.field)
+        frequency = value.get(self.field)
 
-        if frequency > 7:
+        if frequency and frequency > 7:
             raise ValidationError(
                 'Привычку надо повторять минимум один раз в семь дней'
             )
 
 
-# def related_and_pleasant(value):
-#     related_habit = value["related_habit"]
-#     if related_habit and not related_habit.is_pleasant:
-#         raise ValidationError(
-#             "Связанная привычка должна иметь признак приятной"
-#         )
+def related_and_pleasant(value):
+    """ Валидатор что связанная привычка должна быть приятной"""
+    related_habit = value.get("related_habit")
+    if related_habit and not related_habit.is_pleasant:
+        raise ValidationError(
+            "Связанная привычка должна иметь признак приятной"
+        )

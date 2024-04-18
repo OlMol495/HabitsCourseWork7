@@ -5,7 +5,7 @@ from rest_framework.relations import SlugRelatedField
 from habits.models import Habit
 from habits.validators import (RelatedAndRewardValidator,
                                PleasantRewardRelatedValidator, DurationValidator,
-                               FrequencyValidator)  #, related_and_pleasant)
+                               FrequencyValidator, related_and_pleasant)
 
 
 class HabitSerializer(serializers.ModelSerializer):
@@ -19,13 +19,12 @@ class HabitSerializer(serializers.ModelSerializer):
         validators = [
             RelatedAndRewardValidator(field1='related_habit',
                                       field2='reward'),
-            #RelatedHabitPleasantValidator(field1='related_habit'),
             PleasantRewardRelatedValidator(field1='is_pleasant',
                                            field2='related_habit',
                                            field3='reward'),
             DurationValidator(field='duration'),
             FrequencyValidator(field='frequency'),
-            #related_and_pleasant
+            related_and_pleasant
         ]
 
 
@@ -39,11 +38,10 @@ class HabitCreateSerializer(serializers.ModelSerializer):
         validators = [
             RelatedAndRewardValidator(field1='related_habit',
                                       field2='reward'),
-            #RelatedHabitPleasantValidator(field1='related_habit'),
             PleasantRewardRelatedValidator(field1='is_pleasant',
                                            field2='related_habit',
                                            field3='reward'),
             DurationValidator(field='duration'),
             FrequencyValidator(field='frequency'),
-            #related_and_pleasant
+            related_and_pleasant
         ]

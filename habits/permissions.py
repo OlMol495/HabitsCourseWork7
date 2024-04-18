@@ -11,6 +11,7 @@ class IsModerator(permissions.BasePermission):
             return True
         return False
 
+
 class IsOwner(permissions.BasePermission):
     message = 'Это действие доступно только владельцу'
 

@@ -31,12 +31,11 @@ class HabitsOwnListAPIView(generics.ListAPIView):
 class HabitsPublicListAPIView(generics.ListAPIView):
     """Вьюшка на просмотр списка публичных привычек"""
     serializer_class = HabitSerializer
-    queryset = Habit.objects.filter(is_pleasant=False, is_public=True)
     permission_classes = [IsAuthenticated]  # Доступ имеют авторизованные юзеры
     pagination_class = ListPaginator
 
     def get_queryset(self):
-        return Habit.objects.filter(is_public=True)
+        return Habit.objects.filter(is_pleasant=False, is_public=True)
 
 
 class HabitRetrieveAPIView(generics.RetrieveAPIView):

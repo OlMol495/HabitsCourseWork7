@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     "users",
     "habits",
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -164,17 +165,32 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000"
-    #"https://read-only.example.com",
-    #"https://read-and-write.example.com",
+    "http://localhost:8000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://read-and-write.example.com",
+    'http://localhost:8000',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-CHAT_ID = int(os.getenv("CHAT_ID"))
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = 'redis://localhost:6379'
+
+# URL-адрес брокера результатов, также Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = "Europe/Moscow"
+
+# Флаг отслеживания выполнения задач
+CELERY_TASK_TRACK_STARTED = True
+
+CELERY_BEAT_SCHEDULE = {
+    'task-name': {
+        'task': 'habits.tasks.send_habit_reminders',
+        'schedule': timedelta(days=1)
+    }
+}

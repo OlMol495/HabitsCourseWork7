@@ -9,6 +9,7 @@ class Habit(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     place = models.CharField(max_length=155, verbose_name="место")
     time = models.TimeField(verbose_name="время", **NULLABLE)
+    date = models.DateField(verbose_name='дата', **NULLABLE)
     is_pleasant = models.BooleanField(verbose_name="приятная")
     related_habit = models.ForeignKey(
         "self", on_delete=models.CASCADE, verbose_name="связанная привычка", **NULLABLE)
