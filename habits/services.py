@@ -6,6 +6,7 @@ class MyBot:
     URL = "https://api.telegram.org/bot"
     TOKEN = settings.TELEGRAM_BOT_TOKEN
 
+    @staticmethod
     def send_message(self, telegram_id, message):
         """ Отправка сообщения в телеграм чат"""
         requests.post(
@@ -16,7 +17,8 @@ class MyBot:
             }
         )
 
-    def create_message(habit):
+    @staticmethod
+    def create_message(self, habit):
         """ Создание сообщения для бота"""
         if habit.user.telegram_id:
             telegram_id = habit.user.telegram_id

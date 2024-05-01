@@ -6,18 +6,8 @@ from habits.models import Habit
 from users.models import User
 
 
-class HabitTestCase(APITestCase):
-    """ Тесты на CRUD привычек """
-
-    data = {
-        "title": "test-title",
-        "place": "test-place",
-        "time": "20:00:00",
-        "is_pleasant": False,
-        "frequency": 5,
-        "reward": "test-reward",
-        "duration": 120,
-    }
+class HabitCreateTestCase(APITestCase):
+    """ Тесты на Create, Read, Update привычек """
 
     def setUp(self):
         self.user1 = User.objects.create(email="test1@admin.pro", password="admin")
@@ -45,11 +35,22 @@ class HabitTestCase(APITestCase):
             is_public=True,
         )
 
+        self.data_ch = {
+            "title": "test-title",
+            "place": "test-place",
+            "time": "20:00:00",
+            "is_pleasant": False,
+            "frequency": 5,
+            "reward": "test-reward",
+            "duration": 120,
+        }
+
     def test_create_habit(self):
         """ Тесты на создание привычки """
         self.client.force_authenticate(user=self.user1)
-        HabitTestCase.data["user"] = self.user1.pk
-        data = HabitTestCase.data
+        data = self.data_ch
+        data["user"] = self.user1.pk
+        print('DEBUG', data)
         response = self.client.post(
             reverse('habits:habit-create'),
             data=data
@@ -71,6 +72,7 @@ class HabitTestCase(APITestCase):
                 "user": 1,
                 "place": "test-place",
                 "time": "20:00:00",
+                "date": None,
                 "is_pleasant": False,
                 "related_habit": None,
                 "frequency": 5,
@@ -131,7 +133,8 @@ class HabitTestCase(APITestCase):
         """ Тест на отображение деталей конкретной привычки
         постороннему пользователю"""
         self.client.force_authenticate(user=self.user2)
-        HabitTestCase.data["user"] = self.user1
+        data = self.data_ch
+        data["user"] = self.user1
 
         response = self.client.get(
             reverse("habits:habit-detail", args=[self.habitgood.pk])
@@ -164,14 +167,53 @@ class HabitTestCase(APITestCase):
         self.assertEqual(
             update_habit.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_delete_habit(self):
-        # Проверка на невозможность удаления урока сторонним пользователем
+
+class HabitDeleteTestCase(APITestCase):
+    """ Тесты на Delete привычек """
+
+    def setUp(self):
+        self.user1 = User.objects.create(email="test1@admin.pro", password="admin")
+        self.user2 = User.objects.create(email="test2@admin.pro", password="admin")
+        self.habitpleasant = Habit.objects.create(
+            title='Test-pleasant',
+            user=self.user1,
+            place="test-place",
+            time="07:20:00",
+            is_pleasant=True,
+            frequency=1,
+            reward=None,
+            duration=25,
+            is_public=False,
+        )
+        self.habitgood = Habit.objects.create(
+            title='Test-good',
+            user=self.user1,
+            place="test-place",
+            time="07:20:00",
+            is_pleasant=False,
+            frequency=1,
+            reward="test-reward",
+            duration=25,
+            is_public=True,
+        )
+        self.data_ch = {
+            "title": "test-title",
+            "place": "test-place",
+            "time": "20:00:00",
+            "is_pleasant": False,
+            "frequency": 5,
+            "reward": "test-reward",
+            "duration": 120,
+        }
+
+    def test_delete_habits(self):
+        # Проверка на невозможность удаления привычки сторонним пользователем
         self.client.force_authenticate(user=self.user2)
         delete_habit = self.client.delete(reverse(
             'habits:habit-delete', args=[self.habitgood.id]))
         self.assertEqual(delete_habit.status_code, status.HTTP_403_FORBIDDEN)
 
-        # Проверка на удаление урока владельцем
+        # Проверка на удаление привычки владельцем
         self.client.force_authenticate(user=self.user1)
         delete_habit = self.client.delete(reverse(
             'habits:habit-delete', args=[self.habitgood.id]))
@@ -182,51 +224,95 @@ class HabitTestCase(APITestCase):
             status.HTTP_204_NO_CONTENT
         )
 
-        # Проверка отсутствия удаленного урока в базе
+        # Проверка отсутствия удаленной привычки в базе
         get_deleted_habit = self.client.get(reverse(
             "habits:habit-detail", args=[self.habitgood.id]))
         self.assertEqual(
             get_deleted_habit.status_code, status.HTTP_404_NOT_FOUND
         )
 
+
+class HabitWrongTestCase(APITestCase):
+    """Тесты на создание привычек с ошибками и валидаторы"""
+
+    def setUp(self):
+        self.user1 = User.objects.create(email="test1@admin.pro", password="admin")
+        self.user2 = User.objects.create(email="test2@admin.pro", password="admin")
+        self.habitpleasant = Habit.objects.create(
+            title='Test-pleasant',
+            user=self.user1,
+            place="test-place",
+            time="07:20:00",
+            is_pleasant=True,
+            frequency=1,
+            reward=None,
+            duration=25,
+            is_public=False,
+        )
+        self.habitgood = Habit.objects.create(
+            title='Test-good',
+            user=self.user1,
+            place="test-place",
+            time="07:20:00",
+            is_pleasant=False,
+            frequency=1,
+            reward="test-reward",
+            duration=25,
+            is_public=True,
+        )
+        self.data_ch = {
+            "title": "test-title",
+            "place": "test-place",
+            "time": "20:00:00",
+            "is_pleasant": False,
+            "frequency": 5,
+            "reward": "test-reward",
+            "duration": 120,
+        }
+
     def test_create_false_habit(self):
         """ Тесты на создание привычки с ошибками """
         self.client.force_authenticate(user=self.user1)
 
         # Проверка на валидатор RelatedAndReward
-        HabitTestCase.data["related_habit"] = self.habitpleasant
+        data = self.data_ch
+        data["related_habit"] = self.habitpleasant
         response = self.client.post(
             reverse('habits:habit-create'),
-            data=HabitTestCase.data)
+            data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Проверка на валидатор related_and_pleasant
-        HabitTestCase.data["is_pleasant"] = True
+        data = self.data_ch
+        data["is_pleasant"] = True
         response = self.client.post(
             reverse('habits:habit-create'),
-            data=HabitTestCase.data)
+            data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Проверка на валидатор PleasantRewardRelated
-        HabitTestCase.data["related_habit"] = ""
+        data = self.data_ch
+        data["related_habit"] = ""
         response = self.client.post(
             reverse('habits:habit-create'),
-            data=HabitTestCase.data)
+            data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Проверка на валидатор DurationValidator
-        HabitTestCase.data["is_pleasant"] = False
-        HabitTestCase.data["duration"] = 150
+        data = self.data_ch
+        data["is_pleasant"] = False
+        data["duration"] = 150
         response = self.client.post(
             reverse('habits:habit-create'),
-            data=HabitTestCase.data)
+            data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Проверка на валидатор FrequencyValidator
-        HabitTestCase.data["frequency"] = 10
+        data = self.data_ch
+        data["frequency"] = 10
         response = self.client.post(
             reverse('habits:habit-create'),
-            data=HabitTestCase.data)
+            data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_false_habit(self):
