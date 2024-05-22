@@ -3,14 +3,16 @@ from django.conf import settings
 
 
 class MyBot:
+    """Telegram bot class"""
+
     URL = "https://api.telegram.org/bot"
     TOKEN = settings.TELEGRAM_BOT_TOKEN
 
     @staticmethod
-    def send_message(self, telegram_id, message):
+    def send_message(telegram_id, message):
         """ Отправка сообщения в телеграм чат"""
         requests.post(
-            url=f'{self.URL}{self.TOKEN}/sendMessage',
+            url=f'{MyBot.URL}{MyBot.TOKEN}/sendMessage',
             data={
                 'chat_id': telegram_id,
                 'text': message
@@ -18,7 +20,7 @@ class MyBot:
         )
 
     @staticmethod
-    def create_message(self, habit):
+    def create_message(habit):
         """ Создание сообщения для бота"""
         if habit.user.telegram_id:
             telegram_id = habit.user.telegram_id
